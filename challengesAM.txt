@@ -1,0 +1,12 @@
+1,Magic,Borg,3,100
+2,Fight,Huns,3,120,
+3,Mystery,Ferengi,3,150,
+4,Magic,Vandals,9,200,
+5,Mystery,Borg ,7,90,
+6,Fight,Goths,8,45,
+7,Magic,Franks,10,200,
+8,Fight,Sith,10,150,
+9,Mystery,Cardashian,9,300
+10,Fight,Jute,2,300
+11,Magic,Celt,2,250
+12,Mystery,Celt,1,250
