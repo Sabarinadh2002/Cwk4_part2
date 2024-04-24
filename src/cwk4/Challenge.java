@@ -24,13 +24,11 @@ public class Challenge
         this.skillRequired = skillRequired;
         this.reward = reward;
     }
-    
+    // hh
     public int getChallengeNo(){
         return challengeNo;
     }
-    public ChallengeType getType(){
-        return type;
-    }
+    public ChallengeType getType(){return type;}
     public String getEnemy(){
         return enemy;
     }
