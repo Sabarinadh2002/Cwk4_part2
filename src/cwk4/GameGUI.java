@@ -30,10 +30,8 @@ public class GameGUI
     public GameGUI()
     {
         makeFrame();
-        makeMenuBar(myFrame);
-        addChampionMenuItems();
-        addChallengesMenu();
-        addViewStateButton();
+        makeMenuBar();
+
     }
     
 
@@ -41,25 +39,22 @@ public class GameGUI
      * Create the Swing frame and its content.
      */
     private void makeFrame()
-    {    
+    {
         myFrame.setLayout(new BorderLayout());
-        myFrame.add(listing,BorderLayout.CENTER);
+        myFrame.add(listing, BorderLayout.CENTER);
         listing.setVisible(false);
         myFrame.add(eastPanel, BorderLayout.EAST);
-        // set panel layout and add components
-        eastPanel.setLayout(new GridLayout(4,1));
+        eastPanel.setLayout(new GridLayout(4, 1));
         eastPanel.add(meetBtn);
+        eastPanel.add(viewBtn);
         eastPanel.add(clearBtn);
         eastPanel.add(quitBtn);
-        
-        clearBtn.addActionListener(new ClearBtnHandler());
-        meetBtn.addActionListener(new MeetBtnHandler());
-        quitBtn.addActionListener(new QuitBtnHandler());
-        
-        meetBtn.setVisible(true);
-        clearBtn.setVisible(true);
-        quitBtn.setVisible(true);
-        // building is done - arrange the components and show        
+
+        clearBtn.addActionListener(e -> listing.setText(""));
+        meetBtn.addActionListener(e -> meetChallenge());
+        quitBtn.addActionListener(e -> System.exit(0));
+        viewBtn.addActionListener(e -> viewState());
+
         myFrame.pack();
         myFrame.setVisible(true);
     }
@@ -67,75 +62,39 @@ public class GameGUI
     /**
      * Create the main frame's menu bar.
      */
-    private void makeMenuBar(JFrame frame)
+    private void makeMenuBar()
     {
         JMenuBar menubar = new JMenuBar();
-        frame.setJMenuBar(menubar);
-        
-        // create the File menu
+        myFrame.setJMenuBar(menubar);
+
+        // Champions Menu
         JMenu championMenu = new JMenu("Champions");
         menubar.add(championMenu);
-        
-        JMenuItem listChampionItem = new JMenuItem("List Champions in reserve");
-        listChampionItem.addActionListener(new ListReserveHandler());
-        championMenu.add(listChampionItem);
+
+        JMenuItem listTeamItem = new JMenuItem("List Team");
+        listTeamItem.addActionListener(e -> listTeam());
+        championMenu.add(listTeamItem);
+
+        JMenuItem viewChampionItem = new JMenuItem("View Champion");
+        viewChampionItem.addActionListener(e -> viewChampion());
+        championMenu.add(viewChampionItem);
+
+        JMenuItem enterChampionItem = new JMenuItem("Enter Champion");
+        enterChampionItem.addActionListener(e -> enterChampion());
+        championMenu.add(enterChampionItem);
+
+        JMenuItem listAllChampionsItem = new JMenuItem("List All Reserve Champions");
+        listAllChampionsItem.addActionListener(e -> listAllReserveChampions());
+        championMenu.add(listAllChampionsItem);
+
+        // Challenges Menu
+        JMenu challengesMenu = new JMenu("Challenges");
+        JMenuItem listAllChallengesItem = new JMenuItem("List All Challenges");
+        listAllChallengesItem.addActionListener(e -> listAllChallenges());
+        challengesMenu.add(listAllChallengesItem);
+        menubar.add(challengesMenu);
 
  
-    }
-    
-    private class ListReserveHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e) 
-        { 
-            listing.setVisible(true);
-            String xx = gp.getReserve();
-            listing.setText(xx);
-        }
-    }
-    
-   
-    private class ClearBtnHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e) 
-        { 
-            listing.setText(" ");
-        }
-    }
-    
-    private class MeetBtnHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e) 
-        { 
-            int result = -1;
-            String answer = "no such challenge";
-            String inputValue = JOptionPane.showInputDialog("Challenge number ?: ");
-            int num = Integer.parseInt(inputValue);
-            result = gp.meetChallenge(num);
-            switch (result)
-            {
-                case 0:answer = "challenge won by champion"; break;
-                case 1:answer = "challenge lost on skills, champion disqualified";break;
-                case 2:answer = "challenge lost as no suitable champion is available";break;
-                case 3:answer = "challenge lost and vizier completely defeated";break;
-            }
-            
-            JOptionPane.showMessageDialog(myFrame,answer);    
-        }
-    }
-
-    private class QuitBtnHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e) 
-        { 
-            int answer = JOptionPane.showConfirmDialog(myFrame,
-                "Are you sure you want to quit?","Finish",
-                JOptionPane.YES_NO_OPTION);
-            // closes the application
-            if (answer == JOptionPane.YES_OPTION)
-            {
-                System.exit(0); //closes the application
-            }              
-        }
     }
 
     private void addChampionMenuItems() {
@@ -185,10 +144,8 @@ public class GameGUI
     }
     private void enterChampion() {
         String championName = JOptionPane.showInputDialog(myFrame, "Enter the name of the champion to enter:");
-
         if (championName != null && !championName.trim().isEmpty()) {
             int result = gp.enterChampion(championName.trim());
-
             String message;
             switch (result) {
                 case 0:
@@ -205,13 +162,15 @@ public class GameGUI
                     break;
                 default:
                     message = "An unknown error occurred.";
+                    break;
             }
             JOptionPane.showMessageDialog(myFrame, message);
         } else {
             JOptionPane.showMessageDialog(myFrame, "No champion name entered", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
 
-    }private void listAllChallenges(){
+    private void listAllChallenges() {
         String challenges = gp.getAllChallenges();
         listing.setText(challenges);
         listing.setVisible(true);
@@ -220,6 +179,41 @@ public class GameGUI
         String gameState = gp.toString(); // Call the toString method to get the state of the game
         listing.setText(gameState);       // Display the state in the JTextArea
         listing.setVisible(true);         // Make sure the JTextArea is visible
+    }
+
+    private void meetChallenge() {
+        String inputValue = JOptionPane.showInputDialog("Challenge number ?: ");
+        try {
+            int num = Integer.parseInt(inputValue);
+            int result = gp.meetChallenge(num);
+            String answer;
+            switch (result) {
+                case 0:
+                    answer = "challenge won by champion";
+                    break;
+                case 1:
+                    answer = "challenge lost on skills, champion disqualified";
+                    break;
+                case 2:
+                    answer = "challenge lost as no suitable champion is available";
+                    break;
+                case 3:
+                    answer = "challenge lost and vizier completely defeated";
+                    break;
+                default:
+                    answer = "no such challenge";
+                    break;
+            }
+            JOptionPane.showMessageDialog(myFrame, answer);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(myFrame, "Invalid input: Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listAllReserveChampions() {
+        String allReserveChampions = gp.getReserve(); // Call the method to get all reserve champions
+        listing.setText(allReserveChampions);         // Display the champions in the JTextArea
+        listing.setVisible(true);                     // Make sure the JTextArea is visible
     }
 
 }
