@@ -88,8 +88,8 @@ public class GameUI
                 {
                     System.out.println("Enter the name of the champion you want to retire:");
                     String champName = myIn.nextLine().trim();
-                    int result1 = tr.retireChampion(champName);
-                    switch (result1) {
+                    int retireResult = tr.retireChampion(champName);
+                    switch (retireResult) {
                         case 0:
                             System.out.println("Champion retired successfully.");
                             break;
@@ -98,6 +98,9 @@ public class GameUI
                             break;
                         case 2:
                             System.out.println("Champion not found or already retired.");
+                            break;
+                        case -1:
+                            System.out.println("No such champion.");
                             break;
                         default:
                             System.out.println("An unexpected error occurred.");
@@ -176,7 +179,7 @@ public class GameUI
         }
         else if (res ==1)
         {
-            out = "Challenge lost on skill level";
+            out = "Challenge lost on skill level, Champion disqualified";
         }
         else if (res ==2)
         {

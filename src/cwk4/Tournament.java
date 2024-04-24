@@ -235,17 +235,23 @@ public class Tournament implements CARE {
      **/
     public int retireChampion(String nme) {
         Champion champ = champions.get(nme);
-        if (champ != null && champ.getState() != ChampionState.DISQUALIFIED) {
-            int refundAmount = champ.getEntryFee() / 2;
-            treasury += refundAmount;
-            champions.remove(nme);
-            return 0; // Champion retired successfully
-        } else if (champ != null && champ.getState() == ChampionState.DISQUALIFIED) {
-            return 1; // Cannot retire because champion is disqualified
-        } else {
+        if (champ == null) {
+            return -1; // No such champion
+        }
+        if (champ.getState() != ChampionState.ENTERED) {
             return 2; // Champion not found or already retired
         }
-    } // Champion is retired to reserves
+        if (champ.getState() == ChampionState.DISQUALIFIED) {
+            return 1; // Cannot retire because champion is disqualified
+        }
+
+        // Assume champion is retiring successfully
+        int refundAmount = champ.getEntryFee() / 2;
+        treasury += refundAmount;
+        champ.setState(ChampionState.WAITING); // Set champion state back to waiting, assuming it means they are in reserve.
+        return 0;  // Champion not found or already retired
+    }
+     // Champion is retired to reserves
 
 
 

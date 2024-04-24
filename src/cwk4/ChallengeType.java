@@ -9,7 +9,7 @@ import java.io.*;
  */
 public enum ChallengeType implements Serializable
 {
-    MAGIC(" Magicsss"), FIGHT("Fight"), MYSTERY ("Mystery");
+    MAGIC(" Magics"), FIGHT("Fight"), MYSTERY ("Mystery");
     private String type;
     
     private ChallengeType(String ty)
