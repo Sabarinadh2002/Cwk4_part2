@@ -45,24 +45,70 @@ public class GameUI
                     System.out.println(tr.getChampionDetails(ref));
                 } 
                 else if (choice == 4)
-                {   
-                    // provide code here
-                    // output should be meaningful
+                {
+                    System.out.println("Enter the name of the champion you want to enter into the team:");
+                    String championName = myIn.nextLine().trim();
+                    if (!championName.isEmpty()) {
+                        int enterResult = tr.enterChampion(championName);
+                        switch (enterResult) {
+                            case 0:
+                                System.out.println("Champion entered successfully into the team.");
+                                break;
+                            case 1:
+                                System.out.println("Champion is not in reserve.");
+                                break;
+                            case 2:
+                                System.out.println("Not enough money in the treasury.");
+                                break;
+                            case -1:
+                                System.out.println("No such champion found.");
+                                break;
+                            default:
+                                System.out.println("An unexpected error occurred.");
+                                break;
+                        }
+                    } else {
+                        System.out.println("No champion name entered.");
+                    }
 
                 }
                 else if (choice == 5)
                 {
-                    // provide code here
-                    // output should be meaningful
+                    System.out.println("Enter the challenge number:");
+                    int challengeNum = myIn.nextInt();
+                    myIn.nextLine();  // Consume newline left-over
+                    int challengeResult = tr.meetChallenge(challengeNum);
+                    String resultMessage = processChallengeResult(challengeResult);
+                    if (challengeResult == 0) {  // Challenge won
+                        resultMessage += ". Current treasury: " + tr.getMoney() + " gulden";
+                    }
+                    System.out.println(resultMessage);
                 }
                 else if (choice==6)
                 {
-                    // provide code here
-                    // output should be meaningful
+                    System.out.println("Enter the name of the champion you want to retire:");
+                    String champName = myIn.nextLine().trim();
+                    int result1 = tr.retireChampion(champName);
+                    switch (result1) {
+                        case 0:
+                            System.out.println("Champion retired successfully.");
+                            break;
+                        case 1:
+                            System.out.println("Cannot retire because the champion is disqualified.");
+                            break;
+                        case 2:
+                            System.out.println("Champion not found or already retired.");
+                            break;
+                        default:
+                            System.out.println("An unexpected error occurred.");
+                            break;
+                    }
+
                 }  
                 else if (choice==7)
                 {
-                    // provide code here
+                    System.out.println(tr.toString());  // This will call the updated toString() method
+
                 }
                 else if (choice==8)
                 {

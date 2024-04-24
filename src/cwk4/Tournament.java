@@ -73,13 +73,15 @@ public class Tournament implements CARE {
         sb.append("\nTreasury: ").append(treasury);
         sb.append("\nDefeated: ").append(isDefeated() ? "Yes" : "No");
 
-        if (champions.isEmpty()) {
-            sb.append("\nTeam: No champions");
+        String teamMembers = champions.values().stream()
+                .filter(champion -> champion.getState() == ChampionState.ENTERED)
+                .map(Champion::getName)
+                .collect(Collectors.joining(", "));
+
+        if (teamMembers.isEmpty()) {
+            sb.append("\nTeam: No champions entered");
         } else {
-            String teamList = champions.values().stream()
-                    .map(Champion::getName) // Assuming Champion has a getName method
-                    .collect(Collectors.joining(", "));
-            sb.append("\nTeam: ").append(teamList);
+            sb.append("\nTeam: ").append(teamMembers);
         }
 
         return sb.toString();
@@ -192,20 +194,16 @@ public class Tournament implements CARE {
     public int enterChampion(String nme) {
         Champion champ = champions.get(nme);
         if (champ == null) {
-            return -1;
+            return -1; // No such champion
         }
-        if (!champ.isAvailable()) {
-            return 1;
+        if (!champ.isAvailable() || champ.getState() != ChampionState.WAITING) {
+            return 1; // Champion not in reserve or already in team
         }
         if (treasury < champ.getEntryFee()) {
-            return 2;
+            return 2; // Not enough money in the treasury
         }
-
         treasury -= champ.getEntryFee();
         champ.setState(ChampionState.ENTERED);
-
-
-        champions.put(nme, champ);
         return 0;
 
     }
@@ -236,26 +234,19 @@ public class Tournament implements CARE {
      * @return as shown above
      **/
     public int retireChampion(String nme) {
-        Champion champion = champions.get(nme);
-
-        if (champion == null) {
-            return -1; // No such champion
+        Champion champ = champions.get(nme);
+        if (champ != null && champ.getState() != ChampionState.DISQUALIFIED) {
+            int refundAmount = champ.getEntryFee() / 2;
+            treasury += refundAmount;
+            champions.remove(nme);
+            return 0; // Champion retired successfully
+        } else if (champ != null && champ.getState() == ChampionState.DISQUALIFIED) {
+            return 1; // Cannot retire because champion is disqualified
+        } else {
+            return 2; // Champion not found or already retired
         }
+    } // Champion is retired to reserves
 
-        if (champion.getState() == ChampionState.DISQUALIFIED) {
-            return 1; // Champion not retired because disqualified
-        }
-
-        if (champion.getState() != ChampionState.ENTERED) {
-            return 2; // Champion not in team
-        }
-
-        // Assuming retiring a champion involves setting their state to WAITING and making them available
-        champion.setState(ChampionState.WAITING);
-        // Add any additional logic to handle the retirement of the champion, e.g., making them available for future selection
-
-        return 0; // Champion is retired to reserves
-    }
 
 
 
@@ -266,23 +257,12 @@ public class Tournament implements CARE {
      * @return a String representation of the champions in the vizier's team
      **/
     public String getTeam() {
-        StringBuilder sb = new StringBuilder("************ Vizier's Team of champions ********\n");
-
-        // Filter and collect names of champions who are in the team
         String teamMembers = champions.values().stream()
                 .filter(champion -> champion.getState() == ChampionState.ENTERED)
                 .map(Champion::getName)
                 .collect(Collectors.joining(", "));
 
-        if (teamMembers.isEmpty()) {
-            sb.append("No champions entered");
-        } else {
-            sb.append(teamMembers);
-        }
-
-        return sb.toString();
-
-
+        return teamMembers.isEmpty() ? "No champions entered." : "Team members: " + teamMembers;
 
     }
 
@@ -557,6 +537,8 @@ public class Tournament implements CARE {
             // You can log the exception or take further actions as needed
         }
     }
+
+
 
 }
 

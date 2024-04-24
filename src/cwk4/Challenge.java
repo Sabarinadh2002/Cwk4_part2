@@ -1,14 +1,16 @@
 package cwk4;
 
 
+import java.io.Serializable;
+
 /**
  * Write a description of class Challenge here.
  *
  * @author (your name)
  * @version (a version number or a date)
  */
-public class Challenge
-{
+public class Challenge implements Serializable
+{   private static final long serialVersionUID = 1L;
     // instance variables - replace the example below with your own
     private int challengeNo;
     private ChallengeType type;
