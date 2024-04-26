@@ -28,8 +28,29 @@ public abstract class Champion implements Serializable
         this.isAvailable = true;
         this.state = ChampionState.WAITING;
     }
-    
 
+    public String getName(){
+        return name;
+    }
+    public int getSkillLevel(){
+        return skillLevel;
+    }
+    public int getEntryFee(){
+        return entryFee;
+    }
+    public String getType(){
+        return type;
+    }
+    public ChampionState getState(){
+        return state;
+    }
+    public boolean isAvailable(){
+        return isAvailable;
+    }
+
+    public void setState (ChampionState state){
+        this.state = state;
+    }
 
     
     public boolean isSuitableForChallenge(Challenge challenge){
